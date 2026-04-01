@@ -100,6 +100,16 @@ const REVIEWS_POOL = {
   pasticceria: ["I loro cannoncini sono illegali, dolci pazzeschi!", "Torte moderne bellissime e buonissime. Ideale per compleanni.", "Il miglior cannolo siciliano mai mangiato al nord.", "Brioche enormi ripieni di pistacchio... un paradiso.", "Qualità artigianale altissima, prezzi onesti e locale profumatissimo."]
 };
 
+// URL Immagini Unsplash stabili e senza blocchi CORS
+// URL Immagine singola e rappresentativa per categoria
+const CATEGORY_IMAGE = {
+  ristorante: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80",
+  osteria: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+  pizzeria: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
+  bar: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=600&q=80",
+  pasticceria: "https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?auto=format&fit=crop&w=600&q=80"
+};
+
 function generate500Restaurants() {
   const result = [];
   let id = 1;
@@ -165,6 +175,8 @@ function generate500Restaurants() {
     });
 
     let filosofia = "Siamo fieri promotori della filiera corta e del KM zero. Le nostre materie prime provengono da produttori locali selezionati, garantendo freschezza assoluta, rispetto della stagionalità e sostenibilità ambientale.";
+    
+    let imageUrl = CATEGORY_IMAGE[cat];
 
     let item = {
       id: id++,
@@ -172,6 +184,7 @@ function generate500Restaurants() {
       city: cityObj.name,
       cat: cat,
       emoji: tpl.emoji,
+      image: imageUrl,
       stars: starsArr[Math.floor(Math.random() * starsArr.length)],
       avgPrice: `€${tpl.minP}–${tpl.maxP}`,
       address: `Via ${["Roma", "Garibaldi", "Mazzini", "Dante", "Verdi", "Cavour", "Europa"][Math.floor(Math.random()*7)]} ${Math.floor(Math.random()*150)+1}, ${cityObj.name}`,
@@ -199,7 +212,7 @@ function generate500Restaurants() {
 // ── ESECUZIONE & CACHE GIORNALIERA ──
 // Il database si aggiorna a mezzanotte. Finché la giornata non cambia, usa la cache salvata.
 const todayStr = new Date().toLocaleDateString("it-IT"); // Es: "01/04/2026"
-const LS_KEY = "resto_data_v2_" + todayStr.replace(/\//g, "-");
+const LS_KEY = "resto_data_v5_" + todayStr.replace(/\//g, "-");
 
 let RESTAURANTS = [];
 let storedData = localStorage.getItem(LS_KEY);
