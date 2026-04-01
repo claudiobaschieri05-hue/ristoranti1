@@ -51,6 +51,7 @@ const DRINK_CLASSES = { vini:"drink-wine", birre:"drink-beer", bibite:"drink-sof
 
 // ── MAP INIT ──
 let map;
+let markerClusterGroup;
 const markers = [];
 
 function initMap() {
@@ -59,6 +60,12 @@ function initMap() {
     attribution: "© OpenStreetMap",
     maxZoom: 18,
   }).addTo(map);
+
+  markerClusterGroup = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    chunkedLoading: true,
+    maxClusterRadius: 40
+  });
 
   RESTAURANTS.forEach(r => {
     const icon = L.divIcon({
@@ -69,17 +76,21 @@ function initMap() {
       popupAnchor: [0, -38],
     });
 
-    const marker = L.marker([r.lat, r.lng], { icon }).addTo(map);
+    const marker = L.marker([r.lat, r.lng], { icon });
     marker.bindPopup(`
       <div style="min-width:160px;">
-        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#f0c060;">${r.emoji} ${r.name}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:#f0c060;">${r.name}</div>
         <div style="font-size:.8rem;color:#9a8060;margin-top:2px;">📍 ${r.city}</div>
         <div style="font-size:.8rem;color:#c4a878;margin-top:4px;">${r.stars} · ${r.avgPrice}</div>
         <button onclick="openModal(${r.id})" style="margin-top:8px;background:#c9933a;color:#1a1208;border:none;border-radius:12px;padding:5px 14px;font-size:.8rem;font-weight:700;cursor:pointer;">Vedi Menu →</button>
       </div>
     `, { className: "map-popup" });
+    
     markers.push({ marker, restaurant: r });
+    markerClusterGroup.addLayer(marker);
   });
+
+  map.addLayer(markerClusterGroup);
 }
 
 // ── RENDER CARDS ──
@@ -92,7 +103,7 @@ function renderCards(list) {
     card.setAttribute("data-id", r.id);
     card.setAttribute("data-cat", r.cat);
     card.innerHTML = `
-      <div class="card-img">${r.emoji}</div>
+      <div class="card-img" style="background: url('${r.image}') center/cover no-repeat;"></div>
       <div class="card-body">
         <span class="card-cat">${r.cat}</span>
         <div class="card-name">${r.name}</div>
@@ -154,9 +165,9 @@ function openModal(id) {
   `).join("") : "";
 
   document.getElementById("modalContent").innerHTML = `
-    <div class="m-header">
+    <div class="m-header" style="background: linear-gradient(160deg, rgba(20,12,4,0.8) 0%, rgba(20,12,4,0.4) 60%, rgba(20,12,4,0.85) 100%), url('${r.image}') center/cover no-repeat;">
       <div class="m-cat">${r.cat.toUpperCase()}</div>
-      <div class="m-name">${r.emoji} ${r.name}</div>
+      <div class="m-name">${r.name}</div>
       <div class="m-meta">
         <span class="m-meta-item">📍 ${r.address}</span>
         <span class="m-meta-item">📞 ${r.phone}</span>
@@ -231,13 +242,13 @@ function applyFilters() {
 
   // update map markers visibility and calculate bounding box
   let bounds = [];
+  markerClusterGroup.clearLayers();
+
   markers.forEach(({ marker, restaurant: r }) => {
     const show = filtered.some(f => f.id === r.id);
     if (show) { 
-      if (!map.hasLayer(marker)) marker.addTo(map); 
+      markerClusterGroup.addLayer(marker); 
       bounds.push([r.lat, r.lng]);
-    } else { 
-      map.removeLayer(marker); 
     }
   });
 
