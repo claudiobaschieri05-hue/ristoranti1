@@ -156,7 +156,27 @@ body {
   color: #fff; line-height: 1.1;
 }
 .hero-title em { color: var(--gold-l); font-style: italic; }
-.hero-desc { color: #c4a87a; font-size: 1.05rem; line-height: 1.7; max-width: 460px; }
+.hero-desc { color: #c4a87a; font-size: 1.05rem; line-height: 1.7; max-width: 480px; }
+
+.hero-italy-gallery {
+  display: flex; align-items: center; margin: 8px 0;
+}
+.hero-italy-gallery img {
+  width: 48px; height: 48px; object-fit: cover;
+  border-radius: 50%; border: 2px solid var(--dark);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  transition: var(--tr); margin-left: -16px;
+  cursor: pointer; position: relative;
+}
+.hero-italy-gallery img:first-child { margin-left: 0; }
+.hero-italy-gallery img:hover {
+  transform: scale(1.15) translateY(-5px);
+  border-color: var(--gold);
+  z-index: 10;
+}
+.hero-gallery-text {
+  font-size: .75rem; color: #a48c68; font-weight: 700; margin-left: 18px; z-index: 1; text-transform: uppercase; letter-spacing: .08em;
+}
 
 .hero-stats {
   display: flex; gap: 28px;
