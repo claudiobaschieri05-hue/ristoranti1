@@ -4,22 +4,22 @@
 
 // ── TAB LABELS ──
 const TAB_LABELS = {
-  antipasti:  "🥗 Antipasti",
-  pizze:      "🍕 Pizze",
-  colazione:  "☕ Colazione",
-  cicchetti:  "🍢 Cicchetti",
-  panini:     "🥖 Panini",
-  aperitivo:  "🍸 Aperitivo",
-  gelati:     "🍦 Gelati",
-  granite:    "🧊 Granite",
+  antipasti: "🥗 Antipasti",
+  pizze: "🍕 Pizze",
+  colazione: "☕ Colazione",
+  cicchetti: "🍢 Cicchetti",
+  panini: "🥖 Panini",
+  aperitivo: "🍸 Aperitivo",
+  gelati: "🍦 Gelati",
+  granite: "🧊 Granite",
   cioccolato: "🍫 Cioccolato",
-  primi:      "🍝 Primi",
-  secondi:    "🍖 Secondi",
-  dolci:      "🍰 Dolci",
-  bevande:    "🥤 Bevande",
-  vini:       "🍷 Vini",
-  birre:      "🍺 Birre",
-  bibite:     "🥤 Bibite & Caffè",
+  primi: "🍝 Primi",
+  secondi: "🍖 Secondi",
+  dolci: "🍰 Dolci",
+  bevande: "🥤 Bevande",
+  vini: "🍷 Vini",
+  birre: "🍺 Birre",
+  bibite: "🥤 Bibite & Caffè",
 };
 
 // ── UTILS: ORARI ──
@@ -29,7 +29,7 @@ function isCurrentlyOpen(orariStr) {
   const h = now.getHours();
   const m = now.getMinutes();
   const currentTime = h + m / 60;
-  
+
   const slots = orariStr.split('·').map(s => s.trim());
   for (let slot of slots) {
     const parts = slot.split(/[-–]/);
@@ -47,7 +47,7 @@ function isCurrentlyOpen(orariStr) {
 }
 
 // ── DRINK CLASSES ──
-const DRINK_CLASSES = { vini:"drink-wine", birre:"drink-beer", bibite:"drink-soft", bevande:"drink-soft" };
+const DRINK_CLASSES = { vini: "drink-wine", birre: "drink-beer", bibite: "drink-soft", bevande: "drink-soft" };
 
 // ── MAP INIT ──
 let map;
@@ -61,11 +61,8 @@ function initMap() {
     maxZoom: 18,
   }).addTo(map);
 
-  markerClusterGroup = L.markerClusterGroup({
-    showCoverageOnHover: false,
-    chunkedLoading: true,
-    maxClusterRadius: 40
-  });
+  // Utilizziamo un semplice layerGroup invece del cluster per mostrare tutti i "puntini" separati
+  markerClusterGroup = L.layerGroup();
 
   RESTAURANTS.forEach(r => {
     const icon = L.divIcon({
@@ -85,7 +82,7 @@ function initMap() {
         <button onclick="openModal(${r.id})" style="margin-top:8px;background:#c9933a;color:#1a1208;border:none;border-radius:12px;padding:5px 14px;font-size:.8rem;font-weight:700;cursor:pointer;">Vedi Menu →</button>
       </div>
     `, { className: "map-popup" });
-    
+
     markers.push({ marker, restaurant: r });
     markerClusterGroup.addLayer(marker);
   });
@@ -133,7 +130,7 @@ function openModal(id) {
 
   const tabs = Object.keys(r.menu);
   const tabsHTML = tabs.map((k, i) =>
-    `<button class="menu-tab ${i===0?"active":""}" data-tab="${k}" onclick="switchTab('${k}',this)">${TAB_LABELS[k]||k}</button>`
+    `<button class="menu-tab ${i === 0 ? "active" : ""}" data-tab="${k}" onclick="switchTab('${k}',this)">${TAB_LABELS[k] || k}</button>`
   ).join("") + `<button class="menu-tab" data-tab="recensioni" onclick="switchTab('recensioni',this)">⭐ Recensioni</button>`;
 
   const panelsHTML = tabs.map((k, i) => {
@@ -146,9 +143,9 @@ function openModal(id) {
         </div>
         <div class="mi-price">${item.price}</div>
       </div>`).join("");
-    return `<div class="menu-panel ${i===0?"active":""}" id="panel-${k}">${items}</div>`;
+    return `<div class="menu-panel ${i === 0 ? "active" : ""}" id="panel-${k}">${items}</div>`;
   }).join("");
-  
+
   // Costruzione Pannello Recensioni
   const reviewsHTML = r.reviewsList ? r.reviewsList.map(rev => `
     <div class="review-card">
@@ -179,11 +176,11 @@ function openModal(id) {
         
         <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}" target="_blank" class="m-meta-item website-link" style="background: rgba(45,138,57,.15); color: #2d8a39;">🗺️ PORTAMI QUI</a>
 
-        ${r.form_available ? 
-          `<button class="m-book-action" onclick="openBooking(${r.id})" ${r.postiDisponibili <= 0 ? 'disabled' : ''}>
+        ${r.form_available ?
+      `<button class="m-book-action" onclick="openBooking(${r.id})" ${r.postiDisponibili <= 0 ? 'disabled' : ''}>
              ${r.postiDisponibili > 0 ? '📅 PRENOTA UN TAVOLO' : '❌ ESAURITO'}
-           </button>` 
-        : ''}
+           </button>`
+      : ''}
 
       </div>
       <div class="m-desc">${r.desc}</div>
@@ -232,7 +229,7 @@ function applyFilters() {
   const categorySelect = document.getElementById("categoryFilter");
   const cat = categorySelect ? categorySelect.value : "all";
   const q = document.getElementById("searchInput").value.toLowerCase().trim();
-  
+
   const filtered = RESTAURANTS.filter(r => {
     const matchCat = cat === "all" || r.cat === cat;
     const matchQ = !q || r.name.toLowerCase().includes(q) || r.city.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q);
@@ -246,8 +243,8 @@ function applyFilters() {
 
   markers.forEach(({ marker, restaurant: r }) => {
     const show = filtered.some(f => f.id === r.id);
-    if (show) { 
-      markerClusterGroup.addLayer(marker); 
+    if (show) {
+      markerClusterGroup.addLayer(marker);
       bounds.push([r.lat, r.lng]);
     }
   });
@@ -263,7 +260,24 @@ function applyFilters() {
   }
 }
 
-document.getElementById("categoryFilter")?.addEventListener("change", applyFilters);
+const catTabs = document.querySelectorAll(".cat-tab");
+const categorySelect = document.getElementById("categoryFilter");
+
+catTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    catTabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    if (categorySelect) categorySelect.value = tab.dataset.cat;
+    applyFilters();
+  });
+});
+
+categorySelect?.addEventListener("change", (e) => {
+  const selectedCat = e.target.value;
+  catTabs.forEach(t => t.classList.toggle("active", t.dataset.cat === selectedCat));
+  applyFilters();
+});
+
 document.getElementById("searchInput").addEventListener("input", applyFilters);
 
 // ── INIT ──
@@ -271,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCards(RESTAURANTS);
   initMap();
   document.getElementById("countRest").textContent = RESTAURANTS.length;
-  
+
   // Setta la data di oggi per simulare l'aggiornamento
   const oggi = new Date().toLocaleDateString("it-IT");
   document.getElementById("last-update-bar").innerHTML = `🔄 Ultimo aggior. server: <strong>${oggi} 00:00</strong>`;
@@ -303,7 +317,7 @@ chatClose.addEventListener("click", closeChat);
 chatOverlay.addEventListener("click", closeChat);
 
 // Used by the Quick Reply buttons in HTML
-window.sendQuickReply = function(text) {
+window.sendQuickReply = function (text) {
   chatInput.value = text;
   processChat();
 };
@@ -315,32 +329,32 @@ function scrollToBottom() {
 function addChatMsg(text, isUser, suggestionIds = null) {
   const row = document.createElement("div");
   row.className = `msg-row ${isUser ? 'user-row' : 'ai-row'}`;
-  
+
   const avatarHtml = isUser ? `<div class="msg-avatar">👤</div>` : `<div class="msg-avatar">🤖</div>`;
-  
+
   let msgContent = `<div class="msg ${isUser ? 'user-msg' : 'ai-msg'}">${text}</div>`;
-  
+
   if (isUser) {
     row.innerHTML = msgContent + avatarHtml;
   } else {
     row.innerHTML = avatarHtml + msgContent;
   }
-  
+
   const msgDiv = row.querySelector('.msg');
 
   if (suggestionIds && !isUser) {
     // Se è un array di id (Multi-card)
     let ids = Array.isArray(suggestionIds) ? suggestionIds : [suggestionIds];
-    
+
     ids.forEach(id => {
       const r = RESTAURANTS.find(x => x.id === id);
       if (r) {
         const card = document.createElement("div");
         card.className = "chat-sugg-card";
         card.onclick = () => { openModal(r.id); chatWindow.classList.add("hidden"); };
-        
+
         const ratingColor = parseFloat(r.rating) >= 4.5 ? '#2d8a39' : '#c9933a';
-        
+
         card.innerHTML = `
           <div class="chat-sugg-icon">${r.emoji}</div>
           <div class="chat-sugg-info">
@@ -355,18 +369,18 @@ function addChatMsg(text, isUser, suggestionIds = null) {
       }
     });
   }
-  
+
   chatMsgs.appendChild(row);
   scrollToBottom();
 }
 
 function handleAiResponse(query) {
-  chatTyping.classList.add("hidden"); 
-  
+  chatTyping.classList.add("hidden");
+
   const q = query.toLowerCase().trim();
-  
+
   const isVago = q.length < 5 || q === "ciao" || q.includes("ho fame") || q.includes("consigli") || q.includes("aiuto");
-  
+
   // Specific match: controlliamo se il nome base (es. "Sorbillo" ignorando "Napoli") è nella query
   const specificMatch = RESTAURANTS.find(r => {
     let baseName = r.name.toLowerCase().split(' ')[0];
@@ -407,7 +421,7 @@ function handleAiResponse(query) {
     matches = matches.filter(r => r.cat === "ristorante");
     hasFoodOrCatFilter = true;
   }
-  
+
   // B) Filtri Cibo Specifico (se non ha matchato la categoria pura)
   if (!hasFoodOrCatFilter) {
     if (q.includes("pesce") || q.includes("mare") || q.includes("sushi")) {
@@ -426,7 +440,7 @@ function handleAiResponse(query) {
 
   // D) Modificatori Addizionali
   if (q.includes("economico") || q.includes("studenti")) {
-    matches = matches.filter(r => parseInt(r.avgPrice.replace(/[^0-9]/g, '').substring(0,2)) <= 20 || r.cat === 'pizzeria' || r.cat === 'bar');
+    matches = matches.filter(r => parseInt(r.avgPrice.replace(/[^0-9]/g, '').substring(0, 2)) <= 20 || r.cat === 'pizzeria' || r.cat === 'bar');
   }
   if (q.includes("romantica") || q.includes("elegante") || q.includes("lusso") || q.includes("anniversario")) {
     matches = matches.filter(r => r.stars === '★★★★★' || r.stars === '★★★★☆');
@@ -448,7 +462,7 @@ function handleAiResponse(query) {
       addChatMsg(`Perfetto, ho una scelta miratissima per te! Ecco <strong>${top.name}</strong> a ${top.city}.`, false, [top.id]);
     } else {
       // Prendi fino a 3 migliori (Ordinati per r.rating discendente simulato e presi a caso tra i top)
-      const scelti = matches.sort((a,b) => parseFloat(b.rating) - parseFloat(a.rating)).slice(0, 3);
+      const scelti = matches.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating)).slice(0, 3);
       const ids = scelti.map(r => r.id);
       addChatMsg(`Assolutamente! Ho trovato ${matches.length} locali incredibili. Ecco la mia <strong>Top ${ids.length}</strong> assoluta in base a quello che cerchi:`, false, ids);
     }
@@ -463,12 +477,12 @@ function processChat() {
   if (!text) return;
   addChatMsg(text, true);
   chatInput.value = "";
-  
+
   // Show typing indicator
   chatMsgs.appendChild(chatTyping); // move it to the bottom
   chatTyping.classList.remove("hidden");
   scrollToBottom();
-  
+
   // Fake thinking delay for realism
   const thinkingTime = Math.random() * 800 + 800; // 800-1600ms
   setTimeout(() => handleAiResponse(text), thinkingTime);
@@ -484,7 +498,7 @@ const bookForm = document.getElementById("bookForm");
 const bookRestName = document.getElementById("bookRestName");
 let currentBookingRestId = null;
 
-window.openBooking = function(id) {
+window.openBooking = function (id) {
   const r = RESTAURANTS.find(x => x.id === id);
   if (!r) return;
   currentBookingRestId = r.id;
@@ -498,7 +512,7 @@ bookClose.addEventListener("click", () => bookModal.classList.remove("open"));
 bookForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const guests = parseInt(document.getElementById("bookGuests").value, 10);
-  
+
   const r = RESTAURANTS.find(x => x.id === currentBookingRestId);
   if (!r) return;
 
@@ -511,7 +525,7 @@ bookForm.addEventListener("submit", (e) => {
   r.postiDisponibili -= guests;
   alert(`✔️ SUCCESS!\n\nLa richiesta per ${guests} persone è stata inviata a ${r.email}.\n\nIl Ristorante ${r.name} ti confermerà a breve il tavolo.`);
   bookModal.classList.remove("open");
-  
+
   // Ricarica la vista modal e le cards per mostrare i posti scalati
   openModal(r.id);
   applyFilters();
