@@ -216,10 +216,12 @@ document.getElementById("modal").addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
-// ── FILTERS ──
+// ── FILTERS & MAP BOUNDS ──
 function applyFilters() {
-  const cat = document.querySelector(".filter-btn.active")?.dataset.cat || "all";
+  const categorySelect = document.getElementById("categoryFilter");
+  const cat = categorySelect ? categorySelect.value : "all";
   const q = document.getElementById("searchInput").value.toLowerCase().trim();
+  
   const filtered = RESTAURANTS.filter(r => {
     const matchCat = cat === "all" || r.cat === cat;
     const matchQ = !q || r.name.toLowerCase().includes(q) || r.city.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q);
@@ -227,22 +229,30 @@ function applyFilters() {
   });
   renderCards(filtered);
 
-  // update map markers visibility
+  // update map markers visibility and calculate bounding box
+  let bounds = [];
   markers.forEach(({ marker, restaurant: r }) => {
     const show = filtered.some(f => f.id === r.id);
-    if (show) { if (!map.hasLayer(marker)) marker.addTo(map); }
-    else { map.removeLayer(marker); }
+    if (show) { 
+      if (!map.hasLayer(marker)) marker.addTo(map); 
+      bounds.push([r.lat, r.lng]);
+    } else { 
+      map.removeLayer(marker); 
+    }
   });
+
+  // Automatically zoom and pan the map to fit all visible markers
+  if (bounds.length > 0) {
+    if (bounds.length === 1) {
+      // Se c'è solo un risultato, fai zoom diretto sul punto per non sbarellare troppo
+      map.setView(bounds[0], 14);
+    } else {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+    }
+  }
 }
 
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    applyFilters();
-  });
-});
-
+document.getElementById("categoryFilter")?.addEventListener("change", applyFilters);
 document.getElementById("searchInput").addEventListener("input", applyFilters);
 
 // ── INIT ──
