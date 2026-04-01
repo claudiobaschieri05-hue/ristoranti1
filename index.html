@@ -31,14 +31,16 @@
         <p class="logo-sub">Menu interattivi · Prezzi reali · Oltre 30 locali</p>
       </div>
     </div>
-    <nav class="filters">
-      <button class="filter-btn active" data-cat="all">Tutti</button>
-      <button class="filter-btn" data-cat="ristorante">🍴 Ristoranti</button>
-      <button class="filter-btn" data-cat="osteria">🍷 Osterie</button>
-      <button class="filter-btn" data-cat="pasticceria">🥐 Pasticcerie</button>
-      <button class="filter-btn" data-cat="bar">☕ Bar</button>
-      <button class="filter-btn" data-cat="pizzeria">🍕 Pizzerie</button>
-    </nav>
+    <div class="filters-dropdown">
+      <select id="categoryFilter" class="category-select">
+        <option value="all">Tutte le categorie</option>
+        <option value="ristorante">🍴 Ristoranti</option>
+        <option value="osteria">🍷 Osterie</option>
+        <option value="pasticceria">🥐 Pasticcerie</option>
+        <option value="bar">☕ Bar</option>
+        <option value="pizzeria">🍕 Pizzerie</option>
+      </select>
+    </div>
     <div class="search-wrap">
       <input id="searchInput" type="text" placeholder="Cerca ristorante o città…" />
       <span class="search-icon">🔍</span>
